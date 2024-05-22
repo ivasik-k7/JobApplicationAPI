@@ -1,0 +1,38 @@
+services:
+  server:
+    container_name: "application_container"
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - SERVER_ENV=development
+    ports:
+      - 8000:8000
+    depends_on:
+      database:
+        condition: service_healthy
+  database:
+    container_name: "postgres_container"
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: job_app_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    # secrets:
+    #   - postgres_password
+    healthcheck:
+      test: ["CMD", "pg_isready"]
+      interval: 1s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db-data:
+# secrets:
+#   postgres_password:
+#     file: ./postgres_password.txt
