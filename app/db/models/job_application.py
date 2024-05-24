@@ -2,8 +2,7 @@ from datetime import datetime
 from enum import Enum
 from uuid import UUID, uuid4
 
-from pydantic import HttpUrl
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, Relationship, SQLModel
 
 
 class JobApplicationStatus(str, Enum):
@@ -23,3 +22,10 @@ class JobApplication(SQLModel, table=True):
 
     applied_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime | None = Field(default_factory=datetime.utcnow)
+
+    user_id: UUID | None = Field(default=None, foreign_key="users.id")
+
+    user: "User" = Relationship(back_populates="job_applications")
+
+
+from app.db.models.user import User  # noqa
